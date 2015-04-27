@@ -382,6 +382,52 @@ WHERE (([e].[NullableBoolA] = [e].[NullableBoolB] AND ([e].[NullableBoolA] IS NO
                 Sql);
         }
 
+        public override void Compare_equals_method()
+        {
+            base.Compare_equals_method();
+
+            Assert.Equal(
+                @"SELECT [e].[Id]
+FROM [NullSemanticsEntity1] AS [e]
+WHERE [e].[BoolA] = [e].[BoolB]
+
+SELECT [e].[Id]
+FROM [NullSemanticsEntity1] AS [e]
+WHERE [e].[BoolA] = [e].[NullableBoolB]
+
+SELECT [e].[Id]
+FROM [NullSemanticsEntity1] AS [e]
+WHERE [e].[NullableBoolA] = [e].[BoolB]
+
+SELECT [e].[Id]
+FROM [NullSemanticsEntity1] AS [e]
+WHERE ([e].[NullableBoolA] = [e].[NullableBoolB] OR ([e].[NullableBoolA] IS NULL AND [e].[NullableBoolB] IS NULL))",
+                Sql);
+        }
+
+        public override void Compare_equals_method_negated()
+        {
+            base.Compare_equals_method_negated();
+
+            Assert.Equal(
+                @"SELECT [e].[Id]
+FROM [NullSemanticsEntity1] AS [e]
+WHERE [e].[BoolA] <> [e].[BoolB]
+
+SELECT [e].[Id]
+FROM [NullSemanticsEntity1] AS [e]
+WHERE ([e].[BoolA] <> [e].[NullableBoolB] OR [e].[NullableBoolB] IS NULL)
+
+SELECT [e].[Id]
+FROM [NullSemanticsEntity1] AS [e]
+WHERE ([e].[NullableBoolA] <> [e].[BoolB] OR [e].[NullableBoolA] IS NULL)
+
+SELECT [e].[Id]
+FROM [NullSemanticsEntity1] AS [e]
+WHERE (([e].[NullableBoolA] <> [e].[NullableBoolB] OR ([e].[NullableBoolA] IS NULL OR [e].[NullableBoolB] IS NULL)) AND ([e].[NullableBoolA] IS NOT NULL OR [e].[NullableBoolB] IS NOT NULL))",
+                Sql);
+        }
+
         public override void Compare_complex_equal_equal_equal()
         {
             base.Compare_complex_equal_equal_equal();
@@ -600,9 +646,9 @@ WHERE ([e].[NullableStringA] IN ('Foo') OR [e].[NullableStringA] IS NULL)",
                 Sql);
         }
 
-        public override void Where_select_many_or_with_null()
+        public override void Where_multiple_ors_with_null()
         {
-            base.Where_select_many_or_with_null();
+            base.Where_multiple_ors_with_null();
 
             Assert.Equal(
                 @"SELECT [e].[Id]
@@ -611,9 +657,9 @@ WHERE ([e].[NullableStringA] IN ('Foo', 'Blah') OR [e].[NullableStringA] IS NULL
                 Sql);
         }
 
-        public override void Where_select_many_and_with_null()
+        public override void Where_multiple_ands_with_null()
         {
-            base.Where_select_many_and_with_null();
+            base.Where_multiple_ands_with_null();
 
             Assert.Equal(
                 @"SELECT [e].[Id]
@@ -622,9 +668,9 @@ WHERE ([e].[NullableStringA] NOT IN ('Foo', 'Blah') AND [e].[NullableStringA] IS
                 Sql);
         }
 
-        public override void Where_select_many_or_with_nullable_parameter()
+        public override void Where_multiple_ors_with_nullable_parameter()
         {
-            base.Where_select_many_or_with_nullable_parameter();
+            base.Where_multiple_ors_with_nullable_parameter();
 
             Assert.Equal(
                 @"SELECT [e].[Id]
@@ -633,9 +679,9 @@ WHERE ([e].[NullableStringA] IN ('Foo') OR [e].[NullableStringA] IS NULL)",
                 Sql);
         }
 
-        public override void Where_select_many_and_with_nullable_parameter_and_constant()
+        public override void Where_multiple_ands_with_nullable_parameter_and_constant()
         {
-            base.Where_select_many_and_with_nullable_parameter_and_constant();
+            base.Where_multiple_ands_with_nullable_parameter_and_constant();
 
             Assert.Equal(
                 @"__prm3_2: Blah
@@ -646,9 +692,9 @@ WHERE ([e].[NullableStringA] NOT IN ('Foo', @__prm3_2) AND [e].[NullableStringA]
                 Sql);
         }
 
-        public override void Where_select_many_and_with_nullable_parameter_and_constant_not_optimized()
+        public override void Where_multiple_ands_with_nullable_parameter_and_constant_not_optimized()
         {
-            base.Where_select_many_and_with_nullable_parameter_and_constant_not_optimized();
+            base.Where_multiple_ands_with_nullable_parameter_and_constant_not_optimized();
 
             Assert.Equal(
                 @"__prm3_2: Blah
@@ -659,9 +705,9 @@ WHERE (((([e].[NullableStringB] IS NOT NULL AND ([e].[NullableStringA] <> 'Foo' 
                 Sql);
         }
 
-        public override void Where_select_equal_nullable_with_null_value_parameter()
+        public override void Where_equal_nullable_with_null_value_parameter()
         {
-            base.Where_select_equal_nullable_with_null_value_parameter();
+            base.Where_equal_nullable_with_null_value_parameter();
 
             Assert.Equal(
                 @"SELECT [e].[Id]
@@ -670,14 +716,102 @@ WHERE [e].[NullableStringA] IS NULL",
                 Sql);
         }
 
-        public override void Where_select_not_equal_nullable_with_null_value_parameter()
+        public override void Where_not_equal_nullable_with_null_value_parameter()
         {
-            base.Where_select_not_equal_nullable_with_null_value_parameter();
+            base.Where_not_equal_nullable_with_null_value_parameter();
 
             Assert.Equal(
                 @"SELECT [e].[Id]
 FROM [NullSemanticsEntity1] AS [e]
 WHERE [e].[NullableStringA] IS NOT NULL",
+                Sql);
+        }
+
+        public override void Where_equal_with_coalesce()
+        {
+            base.Where_equal_with_coalesce();
+
+            Assert.Equal(
+                @"SELECT [e].[Id]
+FROM [NullSemanticsEntity1] AS [e]
+WHERE ((COALESCE([e].[NullableStringA], [e].[NullableStringB]) = [e].[NullableStringC]) OR (([e].[NullableStringA] IS NULL AND [e].[NullableStringB] IS NULL) AND [e].[NullableStringC] IS NULL))",
+                Sql);
+        }
+
+        public override void Where_not_equal_with_coalesce()
+        {
+            base.Where_not_equal_with_coalesce();
+
+            Assert.Equal(
+                @"SELECT [e].[Id]
+FROM [NullSemanticsEntity1] AS [e]
+WHERE (((COALESCE([e].[NullableStringA], [e].[NullableStringB]) <> [e].[NullableStringC]) OR (([e].[NullableStringA] IS NULL AND [e].[NullableStringB] IS NULL) OR [e].[NullableStringC] IS NULL)) AND (([e].[NullableStringA] IS NOT NULL OR [e].[NullableStringB] IS NOT NULL) OR [e].[NullableStringC] IS NOT NULL))",
+                Sql);
+        }
+
+        public override void Where_equal_with_coalesce_both_sides()
+        {
+            base.Where_equal_with_coalesce_both_sides();
+
+            Assert.Equal(
+                @"SELECT [e].[Id]
+FROM [NullSemanticsEntity1] AS [e]
+WHERE (COALESCE([e].[NullableStringA], [e].[NullableStringB]) = COALESCE([e].[StringA], [e].[StringB]))",
+                Sql);
+        }
+
+        public override void Where_not_equal_with_coalesce_both_sides()
+        {
+            base.Where_not_equal_with_coalesce_both_sides();
+
+            Assert.Equal(
+                @"SELECT [e].[Id]
+FROM [NullSemanticsEntity1] AS [e]
+WHERE (((COALESCE([e].[NullableIntA], [e].[NullableIntB]) <> COALESCE([e].[NullableIntC], [e].[NullableIntB])) OR (([e].[NullableIntA] IS NULL AND [e].[NullableIntB] IS NULL) OR ([e].[NullableIntC] IS NULL AND [e].[NullableIntB] IS NULL))) AND (([e].[NullableIntA] IS NOT NULL OR [e].[NullableIntB] IS NOT NULL) OR ([e].[NullableIntC] IS NOT NULL OR [e].[NullableIntB] IS NOT NULL)))",
+                Sql);
+        }
+
+        public override void Where_equal_with_conditional()
+        {
+            base.Where_equal_with_conditional();
+
+            Assert.Equal(
+                @"SELECT [e].[Id]
+FROM [NullSemanticsEntity1] AS [e]
+WHERE ((CASE WHEN (([e].[NullableStringA] = [e].[NullableStringB] OR ([e].[NullableStringA] IS NULL AND [e].[NullableStringB] IS NULL))) THEN [e].[NullableStringA] ELSE [e].[NullableStringB] END = [e].[NullableStringC]) OR (CASE WHEN (([e].[NullableStringA] = [e].[NullableStringB] OR ([e].[NullableStringA] IS NULL AND [e].[NullableStringB] IS NULL))) THEN [e].[NullableStringA] ELSE [e].[NullableStringB] END IS NULL AND [e].[NullableStringC] IS NULL))",
+                Sql);
+        }
+
+        public override void Where_not_equal_with_conditional()
+        {
+            base.Where_not_equal_with_conditional();
+
+            Assert.Equal(
+                @"SELECT [e].[Id]
+FROM [NullSemanticsEntity1] AS [e]
+WHERE ((([e].[NullableStringC] <> CASE WHEN ((([e].[NullableStringA] = [e].[NullableStringB] AND ([e].[NullableStringA] IS NOT NULL AND [e].[NullableStringB] IS NOT NULL)) OR ([e].[NullableStringA] IS NULL AND [e].[NullableStringB] IS NULL))) THEN [e].[NullableStringA] ELSE [e].[NullableStringB] END) OR ([e].[NullableStringC] IS NULL OR CASE WHEN ((([e].[NullableStringA] = [e].[NullableStringB] AND ([e].[NullableStringA] IS NOT NULL AND [e].[NullableStringB] IS NOT NULL)) OR ([e].[NullableStringA] IS NULL AND [e].[NullableStringB] IS NULL))) THEN [e].[NullableStringA] ELSE [e].[NullableStringB] END IS NULL)) AND ([e].[NullableStringC] IS NOT NULL OR CASE WHEN ((([e].[NullableStringA] = [e].[NullableStringB] AND ([e].[NullableStringA] IS NOT NULL AND [e].[NullableStringB] IS NOT NULL)) OR ([e].[NullableStringA] IS NULL AND [e].[NullableStringB] IS NULL))) THEN [e].[NullableStringA] ELSE [e].[NullableStringB] END IS NOT NULL))",
+                Sql);
+        }
+
+        public override void Where_equal_with_conditional_non_nullable()
+        {
+            base.Where_equal_with_conditional_non_nullable();
+
+            Assert.Equal(
+                @"SELECT [e].[Id]
+FROM [NullSemanticsEntity1] AS [e]
+WHERE (([e].[NullableStringC] <> CASE WHEN ((([e].[NullableStringA] = [e].[NullableStringB] AND ([e].[NullableStringA] IS NOT NULL AND [e].[NullableStringB] IS NOT NULL)) OR ([e].[NullableStringA] IS NULL AND [e].[NullableStringB] IS NULL))) THEN [e].[StringA] ELSE [e].[StringB] END) OR [e].[NullableStringC] IS NULL)",
+                Sql);
+        }
+
+        public override void Where_equal_with_and_and_contains()
+        {
+            base.Where_equal_with_and_and_contains();
+
+            Assert.Equal(
+                @"SELECT [e].[Id]
+FROM [NullSemanticsEntity1] AS [e]
+WHERE ([e].[NullableStringA] LIKE ('%' + [e].[NullableStringB] + '%') AND [e].[BoolA] = 1)",
                 Sql);
         }
 
