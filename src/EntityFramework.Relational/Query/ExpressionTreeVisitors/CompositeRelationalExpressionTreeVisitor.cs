@@ -1,14 +1,29 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+using System.Linq;
 using System.Linq.Expressions;
 using JetBrains.Annotations;
 using Remotion.Linq.Parsing;
+using Microsoft.Data.Entity.Query;
+using System.Collections.Generic;
+using Microsoft.Data.Entity.Query.Annotations;
+using Microsoft.Data.Entity.Relational.Query.Expressions;
+using Microsoft.Data.Entity.Utilities;
 
 namespace Microsoft.Data.Entity.Relational.Query.ExpressionTreeVisitors
 {
     public class CompositePredicateExpressionTreeVisitor : ExpressionTreeVisitor
     {
+        private ICollection<QueryAnnotation> _queryAnnotations;
+
+        public CompositePredicateExpressionTreeVisitor([NotNull] ICollection<QueryAnnotation> queryAnnotations)
+        {
+            Check.NotNull(queryAnnotations, nameof(queryAnnotations));
+
+            _queryAnnotations = queryAnnotations;
+        }
+
         public override Expression VisitExpression(
             [NotNull]Expression expression)
         {
@@ -38,7 +53,8 @@ namespace Microsoft.Data.Entity.Relational.Query.ExpressionTreeVisitors
             var parameterDectector = new ParameterExpressionDetectingVisitor();
             parameterDectector.VisitExpression(currentExpression);
 
-            if (!parameterDectector.ContainsParameters)
+            var useRelationalNullComparisons = _queryAnnotations.OfType<UseRelationalNullComparisonsQueryAnnotation>().Any();
+            if (!parameterDectector.ContainsParameters && !useRelationalNullComparisons)
             {
                 var optimizedNullExpansionVisitor = new NullSemanticsOptimizedExpandingVisitor();
                 var nullSemanticsExpandedOptimized = optimizedNullExpansionVisitor.VisitExpression(currentExpression);
@@ -53,30 +69,18 @@ namespace Microsoft.Data.Entity.Relational.Query.ExpressionTreeVisitors
                 }
             }
 
+            if (useRelationalNullComparisons)
+            {
+                currentExpression = new NotNullableExpression(currentExpression);
+            }
+
             var negationOptimized3 =
                 new PredicateNegationExpressionOptimizer()
                 .VisitExpression(currentExpression);
 
             currentExpression = negationOptimized3;
 
-            var reducedExpression = new ReducingExpressionVisitor()
-                .VisitExpression(currentExpression);
-
-            return reducedExpression;
-        }
-
-        private class ReducingExpressionVisitor : ExpressionTreeVisitor
-        {
-            public override Expression VisitExpression(Expression node)
-            {
-                if (node != null && node.CanReduce)
-                {
-                    var reduced = node.Reduce();
-                    return base.VisitExpression(reduced);
-                }
-
-                return base.VisitExpression(node);
-            }
+            return currentExpression;
         }
 
         private class ParameterExpressionDetectingVisitor : ExpressionTreeVisitor

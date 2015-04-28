@@ -6,13 +6,14 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Data.Entity.FunctionalTests.TestModels.NullSemantics;
 using Microsoft.Data.Entity.FunctionalTests.TestModels.NullSemanticsModel;
+using Microsoft.Data.Entity.Relational.FunctionalTests;
 using Xunit;
 
 namespace Microsoft.Data.Entity.FunctionalTests
 {
     public abstract class NullSemanticsQueryTestBase<TTestStore, TFixture> : IClassFixture<TFixture>, IDisposable
         where TTestStore : TestStore
-        where TFixture : NullSemanticsQueryFixtureBase<TTestStore>, new()
+        where TFixture : NullSemanticsQueryRelationalFixture<TTestStore>, new()
     {
         NullSemanticsData _oracleData = new NullSemanticsData();
 
@@ -343,6 +344,86 @@ namespace Microsoft.Data.Entity.FunctionalTests
 
             AssertQuery<NullSemanticsEntity1>(es => es.Where(e =>
                 e.NullableStringA != prm));
+        }
+
+        [Fact]
+        public virtual void Where_equal_using_database_null_semantics()
+        {
+            using (var context = CreateContext())
+            {
+                context.Entities1
+                    .UseRelationalNullComparisons()
+                    .Where(e => e.NullableBoolA == e.NullableBoolB)
+                    .Select(e => e.Id).ToList();
+            }
+        }
+
+        [Fact]
+        public virtual void Where_equal_using_database_null_semantics_with_parameter()
+        {
+            using (var context = CreateContext())
+            {
+                bool? prm = null;
+
+                context.Entities1
+                    .UseRelationalNullComparisons()
+                    .Where(e => e.NullableBoolA == prm)
+                    .Select(e => e.Id).ToList();
+            }
+        }
+
+        [Fact]
+        public virtual void Where_equal_using_database_null_semantics_complex_with_parameter()
+        {
+            using (var context = CreateContext())
+            {
+                bool prm = false;
+
+                context.Entities1
+                    .UseRelationalNullComparisons()
+                    .Where(e => e.NullableBoolA == e.NullableBoolB || prm)
+                    .Select(e => e.Id).ToList();
+            }
+        }
+
+        [Fact]
+        public virtual void Where_not_equal_using_database_null_semantics()
+        {
+            using (var context = CreateContext())
+            {
+                context.Entities1
+                    .UseRelationalNullComparisons()
+                    .Where(e => e.NullableBoolA != e.NullableBoolB)
+                    .Select(e => e.Id).ToList();
+            }
+        }
+
+        [Fact]
+        public virtual void Where_not_equal_using_database_null_semantics_with_parameter()
+        {
+            using (var context = CreateContext())
+            {
+                bool? prm = null;
+
+                context.Entities1
+                    .UseRelationalNullComparisons()
+                    .Where(e => e.NullableBoolA != prm)
+                    .Select(e => e.Id).ToList();
+            }
+        }
+
+        [Fact]
+        public virtual void Where_not_equal_using_database_null_semantics_complex_with_parameter()
+        {
+            using (var context = CreateContext())
+            {
+                bool prm = false;
+
+                context.Entities1
+                    .UseRelationalNullComparisons()
+                    .Where(e => e.NullableBoolA != e.NullableBoolB || prm)
+                    .Select(e => e.Id).ToList();
+            }
         }
 
         protected void AssertQuery<TItem>(Func<IQueryable<TItem>, IQueryable<TItem>> query)

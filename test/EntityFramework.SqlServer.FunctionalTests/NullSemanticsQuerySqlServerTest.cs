@@ -681,6 +681,76 @@ WHERE [e].[NullableStringA] IS NOT NULL",
                 Sql);
         }
 
+        public override void Where_equal_using_database_null_semantics()
+        {
+            base.Where_equal_using_database_null_semantics();
+
+            Assert.Equal(
+                @"SELECT [n].[Id]
+FROM [NullSemanticsEntity1] AS [n]
+WHERE [n].[NullableBoolA] = [n].[NullableBoolB]",
+                Sql);
+        }
+
+        public override void Where_equal_using_database_null_semantics_with_parameter()
+        {
+            base.Where_equal_using_database_null_semantics_with_parameter();
+
+            Assert.Equal(
+                @"SELECT [n].[Id]
+FROM [NullSemanticsEntity1] AS [n]
+WHERE [n].[NullableBoolA] IS NULL",
+                Sql);
+        }
+
+        public override void Where_equal_using_database_null_semantics_complex_with_parameter()
+        {
+            base.Where_equal_using_database_null_semantics_complex_with_parameter();
+
+            Assert.Equal(
+                @"__prm_0: False
+
+SELECT [n].[Id]
+FROM [NullSemanticsEntity1] AS [n]
+WHERE ([n].[NullableBoolA] = [n].[NullableBoolB] OR @__prm_0 = 1)",
+                Sql);
+        }
+
+        public override void Where_not_equal_using_database_null_semantics()
+        {
+            base.Where_not_equal_using_database_null_semantics();
+
+            Assert.Equal(
+                @"SELECT [n].[Id]
+FROM [NullSemanticsEntity1] AS [n]
+WHERE [n].[NullableBoolA] <> [n].[NullableBoolB]",
+                Sql);
+        }
+
+        public override void Where_not_equal_using_database_null_semantics_with_parameter()
+        {
+            base.Where_not_equal_using_database_null_semantics_with_parameter();
+
+            Assert.Equal(
+                @"SELECT [n].[Id]
+FROM [NullSemanticsEntity1] AS [n]
+WHERE [n].[NullableBoolA] IS NOT NULL",
+                Sql);
+        }
+
+        public override void Where_not_equal_using_database_null_semantics_complex_with_parameter()
+        {
+            base.Where_not_equal_using_database_null_semantics_complex_with_parameter();
+
+            Assert.Equal(
+                @"__prm_0: False
+
+SELECT [n].[Id]
+FROM [NullSemanticsEntity1] AS [n]
+WHERE ([n].[NullableBoolA] <> [n].[NullableBoolB] OR @__prm_0 = 1)",
+                Sql);
+        }
+
         private static string Sql
         {
             get { return TestSqlLoggerFactory.Sql; }

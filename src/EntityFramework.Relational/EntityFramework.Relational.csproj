@@ -65,6 +65,7 @@
     <Compile Include="..\Shared\LoggingExtensions.cs">
       <Link>LoggingExtensions.cs</Link>
     </Compile>
+    <Compile Include="Internal\AnnotatedDbSet`.cs" />
     <Compile Include="IRelationalConnection.cs" />
     <Compile Include="IRelationalDataStore.cs" />
     <Compile Include="IRelationalDataStoreCreator.cs" />
@@ -148,6 +149,7 @@
     <Compile Include="NonTypedValueReaderFactory.cs" />
     <Compile Include="NonTypedValueReaderFactoryFactory.cs" />
     <Compile Include="Query\Annotations\FromSqlQueryAnnotation.cs" />
+    <Compile Include="Query\Annotations\UseRelationalNullComparisonsQueryAnnotation.cs" />
     <Compile Include="Query\AsyncQueryingEnumerable.cs" />
     <Compile Include="Query\AsyncQueryMethodProvider.cs" />
     <Compile Include="Query\CommandBuilder.cs" />

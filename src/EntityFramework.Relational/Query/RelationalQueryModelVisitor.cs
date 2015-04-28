@@ -88,8 +88,9 @@ namespace Microsoft.Data.Entity.Relational.Query
         public override void VisitQueryModel(QueryModel queryModel)
         {
             base.VisitQueryModel(queryModel);
+            var compositePredicateVisitor = new CompositePredicateExpressionTreeVisitor(
+                QueryCompilationContext.QueryAnnotations);
 
-            var compositePredicateVisitor = new CompositePredicateExpressionTreeVisitor();
             foreach (var selectExpression in _queriesBySource.Values.Where(se => se.Predicate != null))
             {
                 selectExpression.Predicate

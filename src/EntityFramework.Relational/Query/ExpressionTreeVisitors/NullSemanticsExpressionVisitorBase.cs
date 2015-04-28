@@ -6,6 +6,7 @@ using System.Linq.Expressions;
 using Microsoft.Data.Entity.Relational.Query.Expressions;
 using JetBrains.Annotations;
 using Remotion.Linq.Parsing;
+using Remotion.Linq.Clauses.Expressions;
 
 namespace Microsoft.Data.Entity.Relational.Query.ExpressionTreeVisitors
 {
@@ -59,6 +60,16 @@ namespace Microsoft.Data.Entity.Relational.Query.ExpressionTreeVisitors
             nullableExpressionsExtractor.VisitExpression(expression);
 
             return nullableExpressionsExtractor.NullableExpressions;
+        }
+
+        protected override Expression VisitExtensionExpression(ExtensionExpression expression)
+        {
+            if (expression is NotNullableExpression)
+            {
+                return expression;
+            }
+
+            return base.VisitExtensionExpression(expression);
         }
     }
 }
