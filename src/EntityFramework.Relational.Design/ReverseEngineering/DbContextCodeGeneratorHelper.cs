@@ -148,7 +148,6 @@ namespace Microsoft.Data.Entity.Relational.Design.ReverseEngineering
             {
                 entityConfiguration.AddFacetConfiguration(
                     new FacetConfiguration(
-                        "ForRelational()",
                         string.Format(CultureInfo.InvariantCulture, "Table({0}, {1})",
                             CSharpUtilities.Instance.DelimitString(entityType.Relational().Table),
                             CSharpUtilities.Instance.DelimitString(entityType.Relational().Schema))));
@@ -158,7 +157,6 @@ namespace Microsoft.Data.Entity.Relational.Design.ReverseEngineering
             {
                 entityConfiguration.AddFacetConfiguration(
                     new FacetConfiguration(
-                        "ForRelational()",
                         string.Format(CultureInfo.InvariantCulture, "Table({0})",
                             CSharpUtilities.Instance.DelimitString(entityType.Relational().Table))));
             }
@@ -235,7 +233,6 @@ namespace Microsoft.Data.Entity.Relational.Design.ReverseEngineering
             {
                 propertyConfiguration.AddFacetConfiguration(
                     new FacetConfiguration(
-                        "ForRelational()",
                         string.Format(CultureInfo.InvariantCulture,
                             "Column({0})",
                             CSharpUtilities.Instance.DelimitString(
@@ -252,7 +249,6 @@ namespace Microsoft.Data.Entity.Relational.Design.ReverseEngineering
             {
                 propertyConfiguration.AddFacetConfiguration(
                     new FacetConfiguration(
-                        "ForRelational()",
                         string.Format(CultureInfo.InvariantCulture,
                             "ColumnType({0})",
                             CSharpUtilities.Instance.DelimitString(
@@ -269,7 +265,6 @@ namespace Microsoft.Data.Entity.Relational.Design.ReverseEngineering
             {
                 propertyConfiguration.AddFacetConfiguration(
                     new FacetConfiguration(
-                        "ForRelational()",
                         string.Format(CultureInfo.InvariantCulture,
                             "DefaultValue({0})",
                             CSharpUtilities.Instance.GenerateLiteral(
@@ -286,7 +281,6 @@ namespace Microsoft.Data.Entity.Relational.Design.ReverseEngineering
             {
                 propertyConfiguration.AddFacetConfiguration(
                     new FacetConfiguration(
-                        "ForRelational()",
                         string.Format(CultureInfo.InvariantCulture,
                             "DefaultExpression({0})",
                                 CSharpUtilities.Instance.DelimitString(
